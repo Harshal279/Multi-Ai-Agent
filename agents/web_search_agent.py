@@ -5,7 +5,7 @@ from typing import Dict, Any, List
 from groq import Groq
 import requests
 from dotenv import load_dotenv
-from ddgs import DDGS
+from duckduckgo_search import DDGS
 
 logger = logging.getLogger(__name__)
 
@@ -134,4 +134,5 @@ Please synthesize the information from these sources to provide a helpful and ac
                 'answer': f'Error performing web search: {str(e)}',
                 'sources': [],
                 'agent': 'web_search'
+
             }

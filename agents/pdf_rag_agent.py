@@ -9,6 +9,7 @@ from sentence_transformers import SentenceTransformer
 import pickle
 from dotenv import load_dotenv
 from groq import Groq
+import pdfplumber
 
 logger = logging.getLogger(__name__)
 
@@ -77,45 +78,41 @@ class PDFRAGAgent:
         chunks = []
         
         try:
-            doc = fitz.open(pdf_path)
             filename = os.path.basename(pdf_path)
-            
-            for page_num in range(len(doc)):
-                page = doc[page_num]
-                text = page.get_text()
-                
-                if text.strip():  # Only add non-empty pages
-                    # Simple chunking by sentences (could be improved)
-                    sentences = text.split('. ')
-                    current_chunk = ""
+            with pdfplumber.open(pdf_path) as pdf:
+                for page_num, page in enumerate(pdf.pages):
+                    text = page.extract_text()
                     
-                    for sentence in sentences:
-                        if len(current_chunk + sentence) < 1000:  # Max chunk size
-                            current_chunk += sentence + ". "
-                        else:
-                            if current_chunk.strip():
-                                chunks.append({
-                                    'text': current_chunk.strip(),
-                                    'filename': filename,
-                                    'page_number': page_num + 1,
-                                    'chunk_id': len(chunks)
-                                })
-                            current_chunk = sentence + ". "
-                    
-                    # Add remaining text
-                    if current_chunk.strip():
-                        chunks.append({
-                            'text': current_chunk.strip(),
-                            'filename': filename,
-                            'page_number': page_num + 1,
-                            'chunk_id': len(chunks)
-                        })
-            
-            doc.close()
+                    if text and text.strip():  # Only add non-empty pages
+                        # Simple chunking by sentences
+                        sentences = text.split('. ')
+                        current_chunk = ""
+                        
+                        for sentence in sentences:
+                            if len(current_chunk + sentence) < 1000:  # Max chunk size
+                                current_chunk += sentence + ". "
+                            else:
+                                if current_chunk.strip():
+                                    chunks.append({
+                                        'text': current_chunk.strip(),
+                                        'filename': filename,
+                                        'page_number': page_num + 1,
+                                        'chunk_id': len(chunks)
+                                    })
+                                current_chunk = sentence + ". "
+                        
+                        # Add remaining text
+                        if current_chunk.strip():
+                            chunks.append({
+                                'text': current_chunk.strip(),
+                                'filename': filename,
+                                'page_number': page_num + 1,
+                                'chunk_id': len(chunks)
+                            })
             
         except Exception as e:
             logger.error(f"Error extracting text from {pdf_path}: {e}")
-            
+        
         return chunks
     
     def ingest_pdf(self, pdf_path: str) -> bool:
@@ -327,5 +324,4 @@ Please provide a comprehensive answer based on the available information."""
                 'answer': f'Error processing query: {str(e)}',
                 'sources': [],
                 'agent': 'pdf_rag'
-
             }

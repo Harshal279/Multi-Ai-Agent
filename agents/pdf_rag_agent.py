@@ -4,7 +4,6 @@ import logging
 import faiss
 import numpy as np
 from typing import List, Dict, Any, Optional
-import fitz  # fitz
 from sentence_transformers import SentenceTransformer
 import pickle
 from dotenv import load_dotenv
@@ -325,3 +324,4 @@ Please provide a comprehensive answer based on the available information."""
                 'sources': [],
                 'agent': 'pdf_rag'
             }
+

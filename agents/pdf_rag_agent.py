@@ -16,7 +16,7 @@ class PDFRAGAgent:
     """Agent for PDF document processing and retrieval"""
     
     def __init__(self):
-        self.groq_client = Groq(api_key=Groq(api_key=os.getenv("GROQ_API_KEY")))
+        self.groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
         self.model = "llama-3.1-8b-instant"
         
         # Initialize embedding model
@@ -327,4 +327,5 @@ Please provide a comprehensive answer based on the available information."""
                 'answer': f'Error processing query: {str(e)}',
                 'sources': [],
                 'agent': 'pdf_rag'
+
             }

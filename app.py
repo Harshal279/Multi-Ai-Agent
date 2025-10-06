@@ -39,7 +39,11 @@ arxiv_agent = ArxivAgent()
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
-
+    
+@app.route('/health')
+def health():
+    return jsonify({'status': 'healthy'}), 200
+    
 @app.route('/')
 def index():
     """Serve the main interface"""

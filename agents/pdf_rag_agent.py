@@ -146,103 +146,21 @@ class PDFRAGAgent:
             return False
     
     def _ingest_sample_pdfs(self):
-        """Ingest sample NebulaByte PDFs if index is empty"""
+        """Ingest sample PDFs if index is empty"""
         if self.index.ntotal > 0:
             return  # Already have documents
             
         sample_pdfs_dir = 'sample_pdfs'
         
-        # Create sample PDFs if they don't exist
-        self._create_sample_pdfs()
+        if not os.path.exists(sample_pdfs_dir):
+            logger.warning(f"Sample PDFs directory {sample_pdfs_dir} does not exist. Skipping sample PDF ingestion.")
+            return
         
         # Ingest all sample PDFs
         for filename in os.listdir(sample_pdfs_dir):
             if filename.endswith('.pdf'):
                 pdf_path = os.path.join(sample_pdfs_dir, filename)
                 self.ingest_pdf(pdf_path)
-    
-    def _create_sample_pdfs(self):
-        """Create sample NebulaByte dialog PDFs"""
-        sample_content_1 = """NebulaByte AI Ethics Discussion
-
-Participant A: What are the key ethical considerations when developing AI systems?
-
-Participant B: I believe transparency is crucial. Users should understand how AI makes decisions that affect them. We also need to address bias in training data.
-
-Participant A: Absolutely. Privacy is another major concern. How do we balance AI capabilities with user privacy?
-
-Participant B: Data minimization principles should guide us. Collect only what is necessary and implement strong security measures."""
-        
-        sample_content_2 = """NebulaByte ML Trends Analysis
-
-Speaker 1: The field of machine learning is evolving rapidly. What trends are you seeing?
-
-Speaker 2: Transformer architectures have revolutionized NLP. We are seeing applications beyond text now.
-
-Speaker 1: How about few-shot and zero-shot learning?
-
-Speaker 2: These approaches are game-changing. They allow models to adapt to new tasks with minimal examples."""
-        
-        sample_content_3 = """NebulaByte Neural Networks Fundamentals
-
-Instructor: Let's review the basics of neural networks.
-
-Student: How do neurons in artificial networks compare to biological ones?
-
-Instructor: Artificial neurons are simplified models. They receive inputs, apply weights, add bias, and pass through an activation function.
-
-Student: What's the purpose of activation functions?
-
-Instructor: They introduce non-linearity, allowing networks to learn complex patterns. Common ones include ReLU, sigmoid, and tanh."""
-        
-        sample_content_4 = """NebulaByte Deep Learning Applications
-
-Expert A: Deep learning has transformed many industries. What applications do you find most impactful?
-
-Expert B: Computer vision in healthcare, particularly medical imaging diagnosis, has saved countless lives.
-
-Expert A: Natural language processing has also seen remarkable progress.
-
-Expert B: Yes, from machine translation to code generation. Large language models can now engage in complex reasoning tasks."""
-        
-        sample_content_5 = """NebulaByte Future of AI Discussion
-
-Futurist: Where do you see AI heading in the next decade?
-
-Researcher: I expect continued growth in multimodal AI and improved reasoning capabilities.
-
-Futurist: What about artificial general intelligence?
-
-Researcher: AGI remains challenging. We may see more specialized AI systems working together rather than single general-purpose systems."""
-        
-        sample_dialogs = [
-            {'filename': 'ai_ethics_dialog.pdf', 'content': sample_content_1},
-            {'filename': 'machine_learning_trends.pdf', 'content': sample_content_2},
-            {'filename': 'neural_networks_basics.pdf', 'content': sample_content_3},
-            {'filename': 'deep_learning_applications.pdf', 'content': sample_content_4},
-            {'filename': 'ai_future_predictions.pdf', 'content': sample_content_5}
-        ]
-        
-        # Create PDF files using pdfplumber
-        for dialog in sample_dialogs:
-            pdf_path = os.path.join('sample_pdfs', dialog['filename'])
-            
-            if not os.path.exists(pdf_path):
-                try:
-                    doc = pdfplumber.open()  # Create new PDF
-                    page = doc.new_page()
-                    
-                    # Add text to page
-                    text_rect = pdfplumber.Rect(50, 50, 550, 750)
-                    page.insert_textbox(text_rect, dialog['content'], 
-                                      fontsize=12, fontname="helv")
-                    
-                    doc.save(pdf_path)
-                    doc.close()
-                    
-                    logger.info(f"Created sample PDF: {dialog['filename']}")
-                except Exception as e:
-                    logger.error(f"Error creating sample PDF {dialog['filename']}: {e}")
     
     def retrieve_relevant_docs(self, query: str, k: int = 5) -> List[Dict[str, Any]]:
         """Retrieve most relevant documents for a query"""
@@ -324,5 +242,3 @@ Please provide a comprehensive answer based on the available information."""
                 'sources': [],
                 'agent': 'pdf_rag'
             }
-
-

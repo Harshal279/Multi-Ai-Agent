@@ -223,17 +223,17 @@ Researcher: AGI remains challenging. We may see more specialized AI systems work
             {'filename': 'ai_future_predictions.pdf', 'content': sample_content_5}
         ]
         
-        # Create PDF files using fitz
+        # Create PDF files using pdfplumber
         for dialog in sample_dialogs:
             pdf_path = os.path.join('sample_pdfs', dialog['filename'])
             
             if not os.path.exists(pdf_path):
                 try:
-                    doc = fitz.open()  # Create new PDF
+                    doc = pdfplumber.open()  # Create new PDF
                     page = doc.new_page()
                     
                     # Add text to page
-                    text_rect = fitz.Rect(50, 50, 550, 750)
+                    text_rect = pdfplumber.Rect(50, 50, 550, 750)
                     page.insert_textbox(text_rect, dialog['content'], 
                                       fontsize=12, fontname="helv")
                     
@@ -324,4 +324,5 @@ Please provide a comprehensive answer based on the available information."""
                 'sources': [],
                 'agent': 'pdf_rag'
             }
+
 

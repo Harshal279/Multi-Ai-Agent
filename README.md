@@ -169,8 +169,7 @@ Dockerize the project for easier deployment.
 
 Author
 Harshal Ghoradkar
-Design Lead – IEEE CS GHRCE
-AI & ML Enthusiast | Python & OpenCV Developer
+
 
 
 
